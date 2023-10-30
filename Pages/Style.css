@@ -1,0 +1,21 @@
+﻿body {
+
+}
+
+.product-container {
+    border: 2px solid #0ff; /* Borde sólido negro de 2 píxeles */
+    margin: 10px; /* Margen entre los elementos */
+    padding: 10px; /* Espacio interior del contenedor */
+    flex: 1;
+}
+
+.product-image {
+    width: 150px; /* Ancho de la imagen */
+    height: 150px; /* Altura de la imagen */
+    display: block; /* Hace que la imagen sea un bloque independiente */
+}
+
+.product-title {
+    font-weight: bold; /* Texto en negrita */
+}
+

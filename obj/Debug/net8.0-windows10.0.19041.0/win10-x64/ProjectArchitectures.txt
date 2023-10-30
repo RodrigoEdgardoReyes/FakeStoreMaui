@@ -1,0 +1,1 @@
+C:\Users\rodri\OneDrive\Escritorio\MAUI\FakeStoreMaui\FakeStoreMaui\FakeStoreMaui.csproj;x64

@@ -1,0 +1,195 @@
+﻿@* <head>
+    <link href="css/usuario.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head> *@
+@page "/Usuario"
+
+
+<div class="body">
+    <div class="user-profile">
+        <div class="usuario-background"></div>
+        <img class="user" src="./css/icons-user/usuario.png" alt="Imagen de Usuario">
+        <h1>Jeffrey Mardoqueo</h1>
+        <h3>Cambiar Nombre de Usuario</h3>
+        <input type="text" placeholder="Nuevo Nombre de Usuario">
+    </div>
+
+    <div class="avatar-selection">
+        <h3>Seleccionar una nueva imagen de perfil:</h3>
+        <div class="avatar-row">
+            <div class="avatar-item">
+                <img src="./css/icons-user/hombre-arana.png" alt="Avatar 1">
+                <div class="avatar-circle"></div>
+            </div>
+
+            <div class="avatar-item">
+                <img src="./css/icons-user/harry-potter.png" alt="Avatar 2">
+                <div class="avatar-circle"></div>
+            </div>
+
+            <div class="avatar-item">
+                <img src="./css/icons-user/donatello.png" alt="Avatar 3">
+                <div class="avatar-circle"></div>
+            </div>
+
+            <div class="avatar-item">
+                <img src="./css/icons-user/hombre-murcielago.png" alt="Avatar 4">
+                <div class="avatar-circle"></div>
+            </div>
+
+            <div class="avatar-item">
+                <img src="./css/icons-user/momia.png" alt="Avatar 5">
+                <div class="avatar-circle"></div>
+            </div>
+        </div>
+
+        <div class="avatar-row">
+            <div class="avatar-item">
+                <img src="./css/icons-user/caperucita-roja.png" alt="Avatar 6">
+                <div class="avatar-circle"></div>
+            </div>
+
+            <div class="avatar-item">
+                <img src="./css/icons-user/princesa.png" alt="Avatar 7">
+                <div class="avatar-circle"></div>
+            </div>
+
+            <div class="avatar-item">
+                <img src="./css/icons-user/nina.png" alt="Avatar 8">
+                <div class="avatar-circle"></div>
+            </div>
+
+            <div class="avatar-item">
+                <img src="./css/icons-user/gorra.png" alt="Avatar 9">
+                <div class="avatar-circle"></div>
+            </div>
+
+            <div class="avatar-item">
+                <img src="./css/icons-user/nina.png" alt="Avatar 10">
+                <div class="avatar-circle"></div>
+            </div>
+        </div>
+
+        <div class="save-button">
+            <button>GUARDAR!</button>
+        </div>
+    </div>
+    </div>
+
+    <style>
+       
+    .body{
+        background-color: #5500B0;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100vh;
+    }
+
+    
+
+    nav {
+        color: #fff;
+        width: 100%;
+        padding: 20px 0;
+        text-align: center;
+    }
+
+    .exit-button {
+        position: absolute;
+        top: 20px;
+        left: 30px;
+        font-size: 30px;
+        color: #fff;
+        text-decoration: none;
+    }
+
+    h1 {
+        font-size: 21px;
+        font-family: 'bungee Inline';
+        color: #ffffff;
+    }
+
+    h3 {
+        text-align: center;
+        font-size: 14px;
+        font-family: 'Bowlby One SC';
+        color: #ffffff;
+    }
+
+    input {
+        width: 100%;
+        max-width: 250px;
+        height: 25px;
+    }
+
+    .user-profile {
+        position: relative;
+        text-align: center;
+        border: 1px solid red;
+    }
+
+    .user {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 50%;
+        margin-top: 30px;
+    }
+
+
+    .usuario-background {
+        width: 140px;
+        height: 140px;
+        background-color: #f8edeb;
+        border-radius: 50%;
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: -1;
+    }
+
+    img {
+        width: 45px;
+        height: 45px;
+        max-width: 100%;
+        height: auto;
+    }
+
+    .avatar-item {
+    display: inline-block;
+    text-align: center;
+    margin: 3px;
+}
+
+    .avatar-circle {
+        width: 55px;
+        height: 55px;
+        background-color: #f8edeb;
+        border-radius: 50%;
+        margin-top: 70px;
+        border: 1px solid red;
+    }
+
+    .save-button {
+    text-align: center;
+    margin-top: 40px;
+}
+
+    .save-button button {
+        background-color: #10E617;
+        font-family: 'Bowlby One SC';
+        color: #000000;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 15px;
+        cursor: pointer;
+        margin-top: 25%;
+    }
+    </style>
+@code {
+
+}

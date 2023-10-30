@@ -1,0 +1,117 @@
+﻿@page "/"
+@using FakeStoreMaui.Models
+@using FakeStoreMaui.Services
+@inject IProductoService ProductoService;
+@inject NavigationManager NavManager;
+<h1>Hello, world!</h1>
+
+@if (productosList == null)
+{
+    <p>Loading....</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>id</th>
+                    <th>Title</th>
+                    <th>Descripción</th>
+                    <th>Imagen</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (productosEliminados != null)
+                {
+                    @foreach (var producto in productosList)
+                    {
+                        if (!productosEliminados.Contains(producto.id))
+                        {
+                            <tr @onclick="@(()=> DisplayOption(producto))">
+                                <td>@producto.id</td>
+                                <td>@producto.title</td>
+                                <td>@producto.description</td>
+                                <td><img src="@producto.image" alt="Product Image" width="100" height="100" /></td>
+                            </tr>
+                        }
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    private List<Producto> productosList;
+    private List<int> productosEliminados;
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarProductos();
+        await CargarProductosEliminados();
+
+        var recargarProductosParam = NavManager.Uri.Contains("recargarProductos=true");
+
+        if (recargarProductosParam)
+        {
+            // Recarga la lista de productos si se especifica en la URL
+            await CargarProductos();
+        }
+    }
+
+    private async void DisplayOption(Producto producto)
+    {
+        var response = await App.Current.MainPage.DisplayActionSheet("Select Option", "OK", null, "Update Product", "Delete Product");
+
+        if (response == "Update Product")
+        {
+            // Redirige a la página de actualización de producto pasando los datos del producto
+            NavManager.NavigateTo($"/updateProducto/{producto.id}/{producto.title}/{producto.description}");
+        }
+        else if (response == "Delete Product")
+        {
+            try
+            {
+                await ProductoService.DeleteProductAsync(producto.id);
+
+                // Actualiza la lista de productos después de eliminar
+                productosList.Remove(producto);
+
+                await App.Current.MainPage.DisplayAlert("Registro Eliminado", "Registro Eliminado con Éxito", "OK");
+            }
+            catch (Exception ex)
+            {
+                // Manejo de errores
+                await App.Current.MainPage.DisplayAlert("Error", $"Error al eliminar producto: {ex.Message}", "OK");
+            }
+        }
+    }
+
+    private async Task CargarProductos()
+    {
+        try
+        {
+            var productos = await ProductoService.GetProductosAsync();
+
+            // Filtra los productos eliminados
+            if (productosEliminados != null)
+            {
+                productosList = productos.Where(p => !productosEliminados.Contains(p.id)).ToList();
+            }
+            else
+            {
+                productosList = productos;
+            }
+        }
+        catch (Exception ex)
+        {
+            // Manejo de errores
+            await App.Current.MainPage.DisplayAlert("Error", $"Error al cargar productos: {ex.Message}", "OK");
+        }
+    }
+
+    private async Task CargarProductosEliminados()
+    {
+        productosEliminados = await ProductoService.GetProductosEliminadosAsync();
+    }
+}

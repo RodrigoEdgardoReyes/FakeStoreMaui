@@ -1,0 +1,92 @@
+﻿@page "/addProducto"
+@page "/updateProducto/{id:int}/{title}/{description}"
+@using FakeStoreMaui.Models
+@using FakeStoreMaui.Services
+@inject IProductoService ProductoService
+@inject NavigationManager NavManager
+
+<h3>Actualizar Producto</h3>
+
+<div class="form-group">
+    <label>Título</label>
+    <input @bind="id" class="form-control" placeholder="ID" disabled>
+</div>
+<div class="form-group">
+    <label>Título</label>
+    <input @bind="title" class="form-control" placeholder="Título">
+</div>
+<div class="mt-2 form-group">
+    <label>Descripción</label>
+    <input @bind="description" class="form-control" placeholder="Descripción">
+</div>
+
+<button @onclick="AddUpdateProductDetails" type="submit" class="mt-2 btn btn-primary">@((id > 0) ? "Actualizar" : "Agregar")</button>
+
+@if (id > 0)
+{
+    <button @onclick="DeleteProduct" type="submit" class="mt-2 btn btn-danger">Eliminar</button>
+}
+
+@code {
+    [Parameter]
+    public int id { get; set; }
+    [Parameter]
+    public string title { get; set; }
+    [Parameter]
+    public string description { get; set; }
+
+    private List<Producto> productosList = new List<Producto>();
+    private Producto existingProductDetail;
+
+    private async Task AddUpdateProductDetails()
+    {
+        var product = new Producto
+            {
+                id = id,
+                title = title,
+                description = description
+            };
+
+        if (id > 0)
+        {
+            await ProductoService.PutProductAsync(product);
+            NavManager.NavigateTo("/?recargarProductos=true"); // Cambiar a la página principal después de actualizar con parámetro de recarga
+        }
+        else
+        {
+            await ProductoService.PostProductAsync(product);
+
+            if (id == 0)
+            {
+                // Simular la adición del producto a la lista
+                productosList.Add(product);
+            }
+            else
+            {
+                // Actualizar el producto en la lista con los nuevos detalles
+                var productToUpdate = productosList.FirstOrDefault(p => p.id == id);
+                if (productToUpdate != null)
+                {
+                    productToUpdate.title = title;
+                    productToUpdate.description = description;
+                }
+            }
+
+            title = description = string.Empty;
+            NavManager.NavigateTo("/?recargarProductos=true"); // Cambiar a la página principal después de agregar o actualizar con parámetro de recarga
+        }
+    }
+
+    private async Task DeleteProduct()
+    {
+        if (id > 0)
+        {
+            await ProductoService.DeleteProductAsync(id);
+
+            // Eliminar el producto de la lista
+            productosList.Remove(existingProductDetail);
+
+            NavManager.NavigateTo("/?recargarProductos=true"); // Cambiar a la página principal después de eliminar con parámetro de recarga
+        }
+    }
+}

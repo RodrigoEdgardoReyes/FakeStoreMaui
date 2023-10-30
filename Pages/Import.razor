@@ -1,0 +1,19 @@
+﻿@page "/error"
+@inject NavigationManager NavManager
+
+<ErrorPage Message="@errorMessage" />
+
+@code {
+    private string errorMessage = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        var uri = NavManager.Uri;
+
+        var errorId = new Uri(NavManager.Uri).Query;
+        if (!string.IsNullOrEmpty(errorId))
+        {
+            errorMessage = "An unhandled error has occurred. Error ID: " + errorId;
+        }
+    }
+}

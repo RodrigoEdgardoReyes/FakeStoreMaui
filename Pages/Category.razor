@@ -1,0 +1,267 @@
+﻿@page "/categoria"
+
+@using FakeStoreMaui.Models <!-- Importa el espacio de nombres Models de la aplicación -->
+@using FakeStoreMaui.Services  <!-- Importa el espacio de nombres Services de la aplicación -->
+@inject ICategoriaService CategoriaService
+@inject NavigationManager NavManager;
+
+<!-- Encabezado de la página -->
+<h3>Categoria</h3> 
+
+<!-- Condición: si show_alert es verdadero, muestra una alerta con el tipo de alerta y el mensaje -->
+@if (show_alert)
+{
+    <div class="alert @type_alert" role="alert">
+        @alert
+    </div>
+}
+
+<!-- Condición: si categoriaList es nulo, muestra un mensaje de "Cargando..." -->
+@if (categoriaList == null)
+{
+    <p>Cargando...</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Nombre</th>
+                    <th>Fecha de Creacion</th>
+                    <th>Ultima Actualizacion</th>
+                    <th>imagen</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var categoria in categoriaList)
+                {
+                    <tr @onclick="@(() => DisplayCategoriaOptions(categoria))">
+                        <!-- Muestra el ID de la categoría -->
+                        <td>@categoria.id</td>
+                        <!-- Muestra el nombre de la categoría -->
+                        <td>@categoria.name</td>
+                        <!-- Muestra la fecha de creación de la categoría -->
+                        <td>@categoria.creationAt</td>
+                        <!-- Muestra la fecha de última actualización de la categoría -->
+                        <td>@categoria.updatedAt</td>
+                        <!-- Muestra una imagen de la categoría -->
+                        <td><img src="@categoria.image" alt="Categoria Image" width="100" height="100" /></td> 
+                        <div class="mt-2">
+                            <!-- Botón para Actualizar una categoría -->
+                            <button @onclick="() => SelectCategory(categoria)" class="mt-2 btn btn-sm btn-primary">Actualizar</button>
+                        </div>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+
+    </div>
+
+   @*  //----------------------INICIO MODAL----------------------// *@
+
+    <!-- Modal = Inicia una sección modal que se muestra u oculta según "modal_class" -->
+    <div class="modal fade @modal_class" id="exampleModal" style="display: @(modal_class == "" ? "none" : "block")" aria-labelledby="exampleModalLabel">
+       
+        <!-- Contenedor de la ventana modal -->
+        <div class="modal-dialog">
+
+            <!-- Contenido de la ventana modal -->
+            <div class="modal-content">
+                
+                <!-- Encabezado de la ventana modal -->
+                <div class="modal-header">
+                   
+                    <!-- Título de la ventana modal -->
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Agregar categoria</h1>
+                   
+                    <!-- Botón de cierre que llama a la función "CloseModal" -->
+                    <button type="button" class="btn-close" @onclick="() => CloseModal()" data-bs-dismiss="modal" aria-label="Close"></button>
+                    
+                </div>
+
+                <!-- Cuerpo de la ventana modal -->
+                <div class="modal-body">
+                   
+                    @if (category.image != null)
+                    {
+                        <!-- Contenedor para mostrar una imagen -->
+                        <div class="w-100 d-flex justify-content-center align-items-center">
+                            
+                            <!-- Muestra una imagen si "category.image" no es nulo -->
+                            <img style="width:200px; height: 200px" src="@category.image" />
+                        </div>
+                    }
+                    <div class="mb-3">
+                        <!-- Etiqueta del campo de entrada de nombre -->
+                        <label for="exampleInputEmail1" class="form-label">name</label>
+
+                        <!-- Campo para ingresar un nombre vinculado a "category.name" -->
+                        <input type="text" @bind="category.name" class="form-control" placeholder="Ingresa el nombre de la categoria">
+                        
+                    </div>
+                    <div class="mb-3">
+                        <!-- Etiqueta del campo de entrada de imagen -->
+                        <label for="exampleInputEmail1" class="form-label">image</label>
+
+                        <!-- Campo de entrada de imagen vinculado a "category.image" -->
+                        <input type="text" @bind="category.image" class="form-control" placeholder="Ingresa el nombre de la categoria">   
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <!-- Pie de la ventana modal -->
+                    <button type="button" class="btn btn-secondary" @onclick="()=>CloseModal()">Close</button>
+                    <!-- Botón de "Cerrar" que llama a la función "CloseModal" -->
+                    @if (category.id != 0)
+                    {
+                        <button @onclick="()=>Put()" type="button" class="btn btn-primary">Actualizar</button>
+                        <!-- Botón "Actualizar" que llama a la función "Put" si "category.id" no es cero -->
+                    }
+                    else
+                    {
+                        
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    @if (modal_class != "")
+    {
+        <div class="modal-backdrop fade show"></div>
+        <!-- Fondo oscuro que se muestra si "modal_class" no está vacío -->
+    }
+
+   @*  //----------------------FIN MODAL-------------------------// *@
+
+}
+@code {
+    
+    
+    private bool showAlert = false; // Indica si mostrar una alerta
+    private string alertMessage = ""; // Mensaje de la alerta
+    private string alertType = "alert-success"; // Tipo de alerta por defecto
+
+    bool show_alert = false; // Indica si mostrar una alerta adicional
+    string alert = ""; // Mensaje de la alerta adicional
+    string modal_class = ""; // Clase para controlar la apariencia del modal
+    string type_alert = ""; // Tipo de alerta adicional
+
+    Categoria category = new Categoria(); // Objeto de la categoría actual
+
+    // Lista de categorías que se va a mostrar en la página
+    private List<Categoria> categoriaList;
+    protected override async Task OnInitializedAsync()
+    {
+        // Método que carga las categorías al inicializar la página
+        await CargarProductos();
+    }
+    //CARGA LOS CATEGORIA
+    private async Task CargarProductos()
+    {
+        // Obtiene la lista de categorías desde el servicio
+        var categoria = await CategoriaService.GetCategoriasAsync();
+
+        // Asigna la lista de categorías a la variable "categoriaList"
+        categoriaList = categoria;
+
+    }
+    //----------------------------
+
+    private async void DisplayCategoriaOptions(Categoria categoria)
+    {
+        // Muestra un ActionSheet (hoja de acciones) para seleccionar una opción
+        var response = await App.Current.MainPage.DisplayActionSheet("Selecciona una opción", "Cancelar", null, "Eliminar Categoría");
+
+        if (response == "Eliminar Categoría")
+        {
+            try
+            {
+                // Llama al servicio para eliminar la categoría con el ID proporcionado
+                await CategoriaService.DeleteCategoriaAsync(categoria.id);
+
+                // Actualiza la lista de categorías después de eliminar
+                categoriaList.Remove(categoria);
+
+                 // Muestra una alerta para informar que el registro se ha eliminado con éxito
+                await App.Current.MainPage.DisplayAlert("Registro Eliminado", "Registro Eliminado con Éxito", "OK");
+            }
+            catch (Exception ex)
+            {
+                 // En caso de error, muestra una alerta con el mensaje de error
+                await App.Current.MainPage.DisplayAlert("Error", $"Error al eliminar categoría: {ex.Message}", "OK");
+            }
+
+            // Llama al método "CargarProductos" para recargar la lista de categorías
+            await CargarProductos();
+        }
+    }
+
+
+    //--------------------------------------------//
+
+    // Método para mostrar una alerta
+    public async Task ShowAlert(string message, string type)
+    {
+        show_alert = true; // Activa la bandera para mostrar la alerta adicional
+        alert = message; // Asigna el mensaje de la alerta
+        type_alert = type; // Asigna el tipo de alerta
+        StateHasChanged(); // Actualiza el estado de la página
+
+        await Task.Delay(5000); // Espera 5 segundos
+
+        show_alert = false; // Desactiva la bandera de la alerta adicional
+        type_alert = ""; // Limpia el tipo de alerta
+        alert = ""; // Limpia el mensaje de la alerta
+        StateHasChanged(); // Actualiza el estado de la página
+    }
+
+    // Método para abrir el modal
+    public void OpenModal()
+    {
+        modal_class = "show"; // Asigna la clase "show" para mostrar el modal
+        StateHasChanged(); // Actualiza el estado de la página
+    }
+
+    // Método para cerrar el modal
+    public void CloseModal()
+    {
+        modal_class = ""; // Limpia la clase para ocultar el modal
+        StateHasChanged(); // Actualiza el estado de la página
+    }
+
+    // Método para actualizar una categoría
+    public async Task Put()
+    {
+        // Llama al servicio para actualizar la categoría
+        bool resultado = await CategoriaService.Put(category); 
+        if (resultado)
+        {
+            // Muestra una alerta de éxito
+            await ShowAlert("Se actualizó la categoría", "alert-success"); 
+            // Cierra el modal
+            CloseModal(); 
+            // Actualiza el estado de la página
+            StateHasChanged(); 
+        }
+        else
+        {
+            // Muestra una alerta de error
+            await ShowAlert("No se pudo actualizar la categoría", "alert-danger"); 
+            CloseModal(); // Cierra el modal
+        }
+    }
+
+    // Método para seleccionar una categoría para edición
+    public void SelectCategory(Categoria category_s)
+    {
+        category.name = category_s.name; // Asigna el nombre de la categoría seleccionada
+        category.image = category_s.image; // Asigna la imagen de la categoría seleccionada
+        category.id = category_s.id; // Asigna el ID de la categoría seleccionada
+        OpenModal(); // Abre el modal
+        StateHasChanged(); // Actualiza el estado de la página
+    }
+}
+

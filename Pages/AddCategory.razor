@@ -1,0 +1,52 @@
+﻿@page "/agregarCategoria"
+@using FakeStoreMaui.Models
+@using FakeStoreMaui.Services
+@inject ICategoriaService CategoriaService
+@inject NavigationManager NavManager
+
+<h3>Agregar Nueva Categoría</h3>
+
+@if (showAlert)
+{
+    <div class="alert @alertType" role="alert">
+        @alertMessage
+    </div>
+}
+
+<div class="form-group">
+    <label>Nombre</label>
+    <input @bind="category.name" class="form-control" placeholder="Nombre">
+</div>
+
+<div class="form-group">
+    <label>Imagen (URL)</label>
+    <input @bind="category.image" class="form-control" placeholder="URL de la imagen">
+</div>
+
+<button @onclick="AgregarCategoria" type="submit" class="mt-2 btn btn-primary">Agregar</button>
+
+@code {
+    private Categoria category = new Categoria();
+    private bool showAlert = false;
+    private string alertMessage = "";
+    private string alertType = "alert-success";
+
+    private async Task AgregarCategoria()
+    {
+        bool resultado = await CategoriaService.Post(category);
+
+        if (resultado)
+        {
+            alertMessage = "Se agregó la categoría";
+            alertType = "alert-success";
+            showAlert = true;
+            NavManager.NavigateTo("/categoria");
+        }
+        else
+        {
+            alertMessage = "No se pudo agregar la categoría";
+            alertType = "alert-danger";
+            showAlert = true;
+        }
+    }
+}
